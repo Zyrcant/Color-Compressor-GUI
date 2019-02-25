@@ -1,10 +1,13 @@
 
+import java.awt.Color;
+import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
-import java.awt.image.ImageFilter;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
+import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
@@ -17,10 +20,13 @@ import javax.swing.JFileChooser;
 
 /**
  *
- * @author Chawp
+ * @author Tiffany Do
  */
-public class ColorCompressorGUI extends javax.swing.JFrame {
 
+public class ColorCompressorGUI extends javax.swing.JFrame {
+    //Stores the original image
+    private BufferedImage originalImage;
+    private BufferedImage postImage;
     /**
      * Creates new form ColorCompressorGUI
      */
@@ -39,9 +45,14 @@ public class ColorCompressorGUI extends javax.swing.JFrame {
 
         fileChooser = new javax.swing.JFileChooser();
         imageLabel = new javax.swing.JLabel();
+        kValue = new javax.swing.JTextField();
+        confirmButton = new javax.swing.JButton();
+        errorLabel = new javax.swing.JLabel();
+        outputImageLabel = new javax.swing.JLabel();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         Open = new javax.swing.JMenuItem();
+        saveItem = new javax.swing.JMenuItem();
         Exit = new javax.swing.JMenuItem();
 
         fileChooser.setDialogTitle("Choose your image");
@@ -50,7 +61,27 @@ public class ColorCompressorGUI extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setBackground(new java.awt.Color(102, 102, 102));
 
-        imageLabel.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        imageLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        imageLabel.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(102, 102, 102)));
+
+        kValue.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                kValueActionPerformed(evt);
+            }
+        });
+
+        confirmButton.setText("Go");
+        confirmButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                confirmButtonActionPerformed(evt);
+            }
+        });
+
+        errorLabel.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
+        errorLabel.setForeground(new java.awt.Color(255, 0, 0));
+
+        outputImageLabel.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        outputImageLabel.setPreferredSize(new java.awt.Dimension(772, 663));
 
         jMenu1.setText("File");
         jMenu1.addActionListener(new java.awt.event.ActionListener() {
@@ -59,6 +90,7 @@ public class ColorCompressorGUI extends javax.swing.JFrame {
             }
         });
 
+        Open.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_O, java.awt.event.InputEvent.CTRL_MASK));
         Open.setText("Open");
         Open.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -67,6 +99,16 @@ public class ColorCompressorGUI extends javax.swing.JFrame {
         });
         jMenu1.add(Open);
 
+        saveItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.event.InputEvent.CTRL_MASK));
+        saveItem.setText("Save Image");
+        saveItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                saveItemActionPerformed(evt);
+            }
+        });
+        jMenu1.add(saveItem);
+
+        Exit.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_F4, java.awt.event.InputEvent.ALT_MASK));
         Exit.setText("Exit");
         Exit.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -84,16 +126,36 @@ public class ColorCompressorGUI extends javax.swing.JFrame {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(21, 21, 21)
-                .addComponent(imageLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 800, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(437, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(21, 21, 21)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(errorLabel)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(imageLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 772, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(30, 30, 30)
+                                .addComponent(outputImageLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 772, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(756, 756, 756)
+                        .addComponent(kValue, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(confirmButton)))
+                .addContainerGap(79, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(45, 45, 45)
-                .addComponent(imageLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 486, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(75, Short.MAX_VALUE))
+                .addContainerGap()
+                .addComponent(errorLabel)
+                .addGap(16, 16, 16)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(imageLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 463, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(outputImageLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 463, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(42, 42, 42)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(kValue, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(confirmButton))
+                .addContainerGap(26, Short.MAX_VALUE))
         );
 
         pack();
@@ -109,16 +171,20 @@ public class ColorCompressorGUI extends javax.swing.JFrame {
         try 
         {
             img = ImageIO.read(file);
-           /* int scale = (int) Math.ceil(img.getHeight()*1.0 / imageLabel.getHeight());
-            Image dimg = img.getScaledInstance(img.getWidth()/scale, imageLabel.getHeight(), Image.SCALE_SMOOTH);
-            ImageIcon imageIcon = new ImageIcon(dimg);*/
-           int hscale = (int)Math.ceil(img.getHeight()*1.0 / imageLabel.getHeight());
-           int wscale = (int)Math.ceil(img.getWidth()*1.0 / imageLabel.getWidth());
-           Image dimg = img.getScaledInstance(img.getWidth()/hscale, imageLabel.getHeight(), Image.SCALE_SMOOTH);
-           if (wscale < hscale)
-               dimg = img.getScaledInstance(imageLabel.getWidth(), img.getHeight()/wscale, Image.SCALE_SMOOTH);
-           ImageIcon imageIcon = new ImageIcon(dimg);
-           imageLabel.setIcon(imageIcon);
+            //stores the read file into the class variable as well
+            originalImage = img;
+            
+            //error checking for images that are too large
+            if(img.getHeight() * img.getWidth() > 8000000)
+                errorLabel.setText("ERROR: Image is too large. Please select an image less than 8 megapixels!");
+            else
+            {
+                //scale for the buffered image preview
+                double scale = Math.min(imageLabel.getHeight() * 1.0 / img.getHeight(), imageLabel.getWidth() * 1.0 / img.getWidth());
+                Image dimg = img.getScaledInstance((int)Math.floor(img.getWidth()*scale), (int)Math.floor(img.getHeight()*scale), Image.SCALE_SMOOTH);
+                ImageIcon imageIcon = new ImageIcon(dimg);
+                imageLabel.setIcon(imageIcon);
+            }
         } catch (IOException e) 
         {
            System.out.println("Error accessing image."); 
@@ -135,6 +201,29 @@ public class ColorCompressorGUI extends javax.swing.JFrame {
     private void ExitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ExitActionPerformed
         System.exit(0);
     }//GEN-LAST:event_ExitActionPerformed
+
+    private void kValueActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_kValueActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_kValueActionPerformed
+
+    private void confirmButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_confirmButtonActionPerformed
+        int k = Integer.parseInt(kValue.getText());
+        BufferedImage kmeansJpg = kmeans_helper(originalImage,k);
+        //ImageIO.write(kmeansJpg, "jpg", new File("tmp.jpg"));
+        postImage = kmeansJpg;
+        double scale = Math.min(imageLabel.getHeight() * 1.0 / kmeansJpg.getHeight(), imageLabel.getWidth() * 1.0 / kmeansJpg.getWidth());
+        Image dimg = kmeansJpg.getScaledInstance((int)Math.floor(kmeansJpg.getWidth()*scale), (int)Math.floor(kmeansJpg.getHeight()*scale), Image.SCALE_SMOOTH);
+        ImageIcon imageIcon = new ImageIcon(dimg);
+        outputImageLabel.setIcon(imageIcon);
+    }//GEN-LAST:event_confirmButtonActionPerformed
+
+    private void saveItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveItemActionPerformed
+        try {
+            ImageIO.write(postImage, "jpg", new File("tmp.jpg"));
+        } catch (IOException ex) {
+            Logger.getLogger(ColorCompressorGUI.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_saveItemActionPerformed
 
     /**
      * @param args the command line arguments
@@ -171,15 +260,11 @@ public class ColorCompressorGUI extends javax.swing.JFrame {
         });
     }
 
-    private ImageIcon createImageIcon(String imagesmiddlegif, String a_pretty_but_meaningless_splat) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-    
     class ImageFilter extends javax.swing.filechooser.FileFilter {
         @Override
         public boolean accept(File file) {
-            // Allow only directories, or files with ".txt" extension
-            return file.isDirectory() || file.getAbsolutePath().endsWith(".png") || file.getAbsolutePath().endsWith(".jpg");
+            // Allow only directories, or files with a raster image extension
+            return file.isDirectory() || file.getAbsolutePath().endsWith(".png") || file.getAbsolutePath().endsWith(".jpg") || file.getAbsolutePath().endsWith(".JPG") || file.getAbsolutePath().endsWith(".PNG") || file.getAbsolutePath().endsWith(".jpeg") || file.getAbsolutePath().endsWith(".JPEG");
         }
         @Override
         public String getDescription() {
@@ -187,13 +272,140 @@ public class ColorCompressorGUI extends javax.swing.JFrame {
             return "Image documents(*.jpg or *.png)";
         }
     } 
+    
+    private static BufferedImage kmeans_helper(BufferedImage originalImage, int k)
+    {
+        int w = originalImage.getWidth();
+        int h = originalImage.getHeight();
+        BufferedImage kmeansImage = new BufferedImage(w,h,originalImage.getType());
+        Graphics2D g = kmeansImage.createGraphics();
+        g.drawImage(originalImage, 0, 0, w,h , null);
+        // Read rgb values from the image
+        int[] rgb=new int[w*h];
+        int count=0;
+        for(int i=0;i<w;i++)
+        {
+                for(int j=0;j<h;j++)
+                {
+                        rgb[count++]=kmeansImage.getRGB(i,j);
+                }
+        }
+        // Call kmeans algorithm: update the rgb values
+        kmeans(rgb,k);
+
+        // Write the new rgb values to the image
+        count=0;
+        for(int i=0;i<w;i++)
+        {
+                for(int j=0;j<h;j++)
+                {
+                        kmeansImage.setRGB(i,j,rgb[count++]);
+                }
+        }
+        return kmeansImage;
+    }
+    
+     // Update the array rgb by assigning each entry in the rgb array to its cluster center
+    private static void kmeans(int[] rgb, int k)
+    {
+        //assign k random clusters
+        int[] kclusters = new int[k];
+        int[] assignments = new int[rgb.length];
+        Random rand = new Random();
+        for(int i = 0; i < kclusters.length; i++)
+                kclusters[i] = rgb[rand.nextInt(rgb.length)];
+
+        //hard number of iterations
+        int iterations = 30;
+
+        //current pixel to be assigned to a cluster
+        int currentPixel;
+        for(int iter = 0; iter < iterations; iter++)
+        {
+            //find min distance of every pixel to each cluster and assign to a cluster
+            for(int i = 0; i < rgb.length; i++)
+            {
+                //need to change the integer value into RGB to select each RGB value
+                currentPixel = rgb[i];
+                Color current = new Color(currentPixel);
+
+                //find min distance to clusters
+                double min = Integer.MAX_VALUE;
+                int minIndex = 0;
+
+                //go through all clusters to find which one is closest in terms of RGB values
+                for (int j = 0; j < kclusters.length; j++)
+                {
+                    //find differences in R, G, and B
+                    Color cluster = new Color(kclusters[j]);
+                    int dBlue = current.getBlue() - cluster.getBlue();
+                    int dGreen = current.getGreen() - cluster.getGreen();
+                    int dRed = current.getRed() - cluster.getRed();
+                    //find the closest in regards to all values. values are multiplied in case some are negative
+                    if(Math.sqrt(dBlue*dBlue + dGreen*dGreen + dRed*dRed) < min)
+                    {
+                            min = Math.sqrt(dBlue*dBlue + dGreen*dGreen + dRed*dRed);
+                            minIndex = j;
+                    }
+                }
+                //save the cluster assignment
+                assignments[i] = minIndex;
+            }
+
+            //find the cluster means
+            for(int i = 0; i < k; i++)
+            {
+                //keep track of the sum of all values of r, g, and b along with the count of how many pixels are assigned to the ith cluster
+                int redSum = 0;
+                int greenSum = 0;
+                int blueSum = 0;
+                int count = 0;
+
+                //go through all pixels and find out where they are assigned
+                for(int j = 0; j < assignments.length; j++)
+                {
+                    if(i == assignments[j])
+                    {
+                        Color current = new Color(rgb[j]);
+                        redSum += current.getRed();
+                        greenSum += current.getGreen();
+                        blueSum += current.getBlue();
+                        count++;
+                    }
+                }
+                //sometimes the count may be 0, if so set a new cluster
+                if(count == 0)
+                {
+                    kclusters[i] = rgb[rand.nextInt(rgb.length)];
+                }
+                //find means
+                else
+                {
+                    redSum /= count;
+                    greenSum /= count;
+                    blueSum /= count;
+                    kclusters[i] = new Color(redSum, greenSum, blueSum).getRGB();
+                }
+            }
+        }
+        //write the final values back to the new image
+        for(int i = 0; i < rgb.length; i++)
+        {
+                rgb[i] = kclusters[assignments[i]];
+        }
+}
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem Exit;
     private javax.swing.JMenuItem Open;
+    private javax.swing.JButton confirmButton;
+    private javax.swing.JLabel errorLabel;
     private javax.swing.JFileChooser fileChooser;
     private javax.swing.JLabel imageLabel;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenuBar jMenuBar1;
+    private javax.swing.JTextField kValue;
+    private javax.swing.JLabel outputImageLabel;
+    private javax.swing.JMenuItem saveItem;
     // End of variables declaration//GEN-END:variables
 }
