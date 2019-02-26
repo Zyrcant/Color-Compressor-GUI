@@ -5,7 +5,7 @@ Uses the K-means clustering algorithm to compress images in terms of both size a
 (From Andrew Ng)
 
 # Sample Usage
-![Example](https://i.imgur.com/LozQekm.png)
+![Example](https://i.imgur.com/2qyp4aT.png)
 
 Built in file system support for opening and saving images
 ![Example2](https://i.imgur.com/j6TUxEL.png)
