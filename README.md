@@ -5,12 +5,14 @@ Uses the K-means clustering algorithm to compress images in terms of both size a
 (From Andrew Ng)
 
 # Sample Usage
-![Example](https://i.imgur.com/XMgtrov.png)
+![Example](https://i.imgur.com/2qyp4aT.png)
 
 Built in file system support for opening and saving images
-![Example2](https://i.imgur.com/WvFLLXA.png)
+![Example2](https://i.imgur.com/j6TUxEL.png)
 
 Currently only accepts raster images (.jpg, .png, .jpeg) files up to 8 megapixels. Handles basic user error checking.
 
 # Comparison
 ![Penguins](https://i.imgur.com/G9FfXN8.png)
+
+This application was written by Tiffany Do with minor bug fixes and help from Dylan Yu and Seong Ioi Wang. Image preprocessing was provided by Vibhav Gogate at UT Dallas. 
