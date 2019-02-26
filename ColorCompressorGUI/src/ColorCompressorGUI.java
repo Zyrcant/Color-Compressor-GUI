@@ -241,7 +241,6 @@ public class ColorCompressorGUI extends javax.swing.JFrame {
     private void confirmButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_confirmButtonActionPerformed
         //flush any error messages
         errorLabel.setText("");
-        
         int k = Integer.parseInt(kValue.getText());
         if(originalImage == null)
         {
@@ -264,7 +263,6 @@ public class ColorCompressorGUI extends javax.swing.JFrame {
         else
         {
             BufferedImage kmeansJpg = kmeans_helper(originalImage,k);
-            //ImageIO.write(kmeansJpg, "jpg", new File("tmp.jpg"));
             postImage = kmeansJpg;
             double scale = Math.min(imageLabel.getHeight() * 1.0 / kmeansJpg.getHeight(), imageLabel.getWidth() * 1.0 / kmeansJpg.getWidth());
             Image dimg = kmeansJpg.getScaledInstance((int)Math.floor(kmeansJpg.getWidth()*scale), (int)Math.floor(kmeansJpg.getHeight()*scale), Image.SCALE_SMOOTH);
@@ -278,7 +276,11 @@ public class ColorCompressorGUI extends javax.swing.JFrame {
         if (returnVal == JFileChooser.APPROVE_OPTION){ 
             File file = fileChooser.getSelectedFile();
             try {
-                ImageIO.write(postImage, "jpg", file);
+                //sometimes encoding a png as a jpg will mess it up
+                if(file.getAbsolutePath().endsWith(".png"))
+                    ImageIO.write(postImage, "png", file);
+                else
+                    ImageIO.write(postImage, "jpg", file);
             } catch (IOException ex) {
                 Logger.getLogger(ColorCompressorGUI.class.getName()).log(Level.SEVERE, null, ex);
             }
