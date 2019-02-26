@@ -25,7 +25,7 @@ import javax.swing.JFileChooser;
 
 public class ColorCompressorGUI extends javax.swing.JFrame {
     //Stores the original image
-    private BufferedImage originalImage;
+    private BufferedImage originalImage = null;
     private BufferedImage postImage;
     /**
      * Creates new form ColorCompressorGUI
@@ -44,11 +44,13 @@ public class ColorCompressorGUI extends javax.swing.JFrame {
     private void initComponents() {
 
         fileChooser = new javax.swing.JFileChooser();
+        jPanel1 = new javax.swing.JPanel();
         imageLabel = new javax.swing.JLabel();
+        outputImageLabel = new javax.swing.JLabel();
         kValue = new javax.swing.JTextField();
         confirmButton = new javax.swing.JButton();
+        jLabel1 = new javax.swing.JLabel();
         errorLabel = new javax.swing.JLabel();
-        outputImageLabel = new javax.swing.JLabel();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         Open = new javax.swing.JMenuItem();
@@ -60,13 +62,25 @@ public class ColorCompressorGUI extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setBackground(new java.awt.Color(102, 102, 102));
+        setResizable(false);
+
+        jPanel1.setBackground(new java.awt.Color(102, 102, 102));
 
         imageLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        imageLabel.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(102, 102, 102)));
+        imageLabel.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+
+        outputImageLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        outputImageLabel.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        outputImageLabel.setPreferredSize(new java.awt.Dimension(772, 663));
 
         kValue.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 kValueActionPerformed(evt);
+            }
+        });
+        kValue.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                kValueKeyTyped(evt);
             }
         });
 
@@ -77,11 +91,52 @@ public class ColorCompressorGUI extends javax.swing.JFrame {
             }
         });
 
-        errorLabel.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
-        errorLabel.setForeground(new java.awt.Color(255, 0, 0));
+        jLabel1.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
+        jLabel1.setForeground(new java.awt.Color(204, 204, 204));
+        jLabel1.setText("Colors:");
 
-        outputImageLabel.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        outputImageLabel.setPreferredSize(new java.awt.Dimension(772, 663));
+        errorLabel.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
+        errorLabel.setForeground(new java.awt.Color(255, 102, 102));
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(729, 729, 729)
+                        .addComponent(jLabel1)
+                        .addGap(18, 18, 18)
+                        .addComponent(kValue, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(confirmButton))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(32, 32, 32)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(errorLabel)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(imageLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 772, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(outputImageLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 772, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                .addContainerGap(36, Short.MAX_VALUE))
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(18, 18, 18)
+                .addComponent(errorLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(imageLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 463, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(outputImageLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 463, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(39, 39, 39)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(kValue, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(confirmButton)
+                    .addComponent(jLabel1))
+                .addContainerGap(56, Short.MAX_VALUE))
+        );
 
         jMenu1.setText("File");
         jMenu1.addActionListener(new java.awt.event.ActionListener() {
@@ -100,7 +155,7 @@ public class ColorCompressorGUI extends javax.swing.JFrame {
         jMenu1.add(Open);
 
         saveItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.event.InputEvent.CTRL_MASK));
-        saveItem.setText("Save Image");
+        saveItem.setText("Save Image As..");
         saveItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 saveItemActionPerformed(evt);
@@ -125,73 +180,51 @@ public class ColorCompressorGUI extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(21, 21, 21)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(errorLabel)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(imageLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 772, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(30, 30, 30)
-                                .addComponent(outputImageLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 772, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(756, 756, 756)
-                        .addComponent(kValue, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(confirmButton)))
-                .addContainerGap(79, Short.MAX_VALUE))
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(errorLabel)
-                .addGap(16, 16, 16)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(imageLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 463, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(outputImageLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 463, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(42, 42, 42)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(kValue, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(confirmButton))
-                .addContainerGap(26, Short.MAX_VALUE))
+            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void OpenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_OpenActionPerformed
-        int returnVal = fileChooser.showOpenDialog(this);
-    if (returnVal == JFileChooser.APPROVE_OPTION) {
-        File file = fileChooser.getSelectedFile();
+        //flush the output image and any error messages
+        outputImageLabel.setIcon(null);
+        errorLabel.setText("");
         
-        // buffered image preview
-        BufferedImage img = null;
-        try 
-        {
-            img = ImageIO.read(file);
-            //stores the read file into the class variable as well
-            originalImage = img;
-            
-            //error checking for images that are too large
-            if(img.getHeight() * img.getWidth() > 8000000)
-                errorLabel.setText("ERROR: Image is too large. Please select an image less than 8 megapixels!");
-            else
+        int returnVal = fileChooser.showOpenDialog(this);
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            File file = fileChooser.getSelectedFile();
+        
+            // buffered image preview
+            BufferedImage img = null;
+            try 
             {
-                //scale for the buffered image preview
-                double scale = Math.min(imageLabel.getHeight() * 1.0 / img.getHeight(), imageLabel.getWidth() * 1.0 / img.getWidth());
-                Image dimg = img.getScaledInstance((int)Math.floor(img.getWidth()*scale), (int)Math.floor(img.getHeight()*scale), Image.SCALE_SMOOTH);
-                ImageIcon imageIcon = new ImageIcon(dimg);
-                imageLabel.setIcon(imageIcon);
+                img = ImageIO.read(file);
+                //stores the read file into the class variable as well
+                originalImage = img;
+
+                //error checking for images that are too large
+                if(img.getHeight() * img.getWidth() > 8000000)
+                    errorLabel.setText("ERROR: Image is too large. Please select an image less than 8 megapixels!");
+                else
+                {
+                    //scale for the buffered image preview
+                    double scale = Math.min(imageLabel.getHeight() * 1.0 / img.getHeight(), imageLabel.getWidth() * 1.0 / img.getWidth());
+                    Image dimg = img.getScaledInstance((int)Math.floor(img.getWidth()*scale), (int)Math.floor(img.getHeight()*scale), Image.SCALE_SMOOTH);
+                    ImageIcon imageIcon = new ImageIcon(dimg);
+                    imageLabel.setIcon(imageIcon);
+                }
+            } 
+            catch (IOException e) 
+            {
+               System.out.println("Error accessing image."); 
             }
-        } catch (IOException e) 
-        {
-           System.out.println("Error accessing image."); 
-        }
-    } else {
-        System.out.println("File access cancelled by user.");
-    }
+        } else 
+            System.out.println("File access cancelled by user.");
     }//GEN-LAST:event_OpenActionPerformed
 
     private void jMenu1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenu1ActionPerformed
@@ -207,23 +240,48 @@ public class ColorCompressorGUI extends javax.swing.JFrame {
     }//GEN-LAST:event_kValueActionPerformed
 
     private void confirmButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_confirmButtonActionPerformed
+        //flush any error messages
+        errorLabel.setText("");
+        
         int k = Integer.parseInt(kValue.getText());
-        BufferedImage kmeansJpg = kmeans_helper(originalImage,k);
-        //ImageIO.write(kmeansJpg, "jpg", new File("tmp.jpg"));
-        postImage = kmeansJpg;
-        double scale = Math.min(imageLabel.getHeight() * 1.0 / kmeansJpg.getHeight(), imageLabel.getWidth() * 1.0 / kmeansJpg.getWidth());
-        Image dimg = kmeansJpg.getScaledInstance((int)Math.floor(kmeansJpg.getWidth()*scale), (int)Math.floor(kmeansJpg.getHeight()*scale), Image.SCALE_SMOOTH);
-        ImageIcon imageIcon = new ImageIcon(dimg);
-        outputImageLabel.setIcon(imageIcon);
+        if(k > 16777216)
+        {
+            errorLabel.setText("ERROR: That is in fact more colors than a computer can recognize!");
+        }
+        else if(originalImage == null)
+        {
+            errorLabel.setText("ERROR: There is no given image!");
+        }
+        else
+        {
+            BufferedImage kmeansJpg = kmeans_helper(originalImage,k);
+            //ImageIO.write(kmeansJpg, "jpg", new File("tmp.jpg"));
+            postImage = kmeansJpg;
+            double scale = Math.min(imageLabel.getHeight() * 1.0 / kmeansJpg.getHeight(), imageLabel.getWidth() * 1.0 / kmeansJpg.getWidth());
+            Image dimg = kmeansJpg.getScaledInstance((int)Math.floor(kmeansJpg.getWidth()*scale), (int)Math.floor(kmeansJpg.getHeight()*scale), Image.SCALE_SMOOTH);
+            ImageIcon imageIcon = new ImageIcon(dimg);
+            outputImageLabel.setIcon(imageIcon);
+        }
     }//GEN-LAST:event_confirmButtonActionPerformed
 
     private void saveItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveItemActionPerformed
-        try {
-            ImageIO.write(postImage, "jpg", new File("tmp.jpg"));
-        } catch (IOException ex) {
-            Logger.getLogger(ColorCompressorGUI.class.getName()).log(Level.SEVERE, null, ex);
+        int returnVal = fileChooser.showOpenDialog(this);
+        if (returnVal == JFileChooser.APPROVE_OPTION){ 
+            File file = fileChooser.getSelectedFile();
+            try {
+                ImageIO.write(postImage, "jpg", file);
+            } catch (IOException ex) {
+                Logger.getLogger(ColorCompressorGUI.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }//GEN-LAST:event_saveItemActionPerformed
+
+    private void kValueKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_kValueKeyTyped
+        char enter = evt.getKeyChar();
+        if(!(Character.isDigit(enter)) || kValue.getText().length() > 8){
+            evt.consume();
+        }
+    }//GEN-LAST:event_kValueKeyTyped
 
     /**
      * @param args the command line arguments
@@ -393,8 +451,8 @@ public class ColorCompressorGUI extends javax.swing.JFrame {
         {
                 rgb[i] = kclusters[assignments[i]];
         }
-}
-
+    }
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem Exit;
     private javax.swing.JMenuItem Open;
@@ -402,8 +460,10 @@ public class ColorCompressorGUI extends javax.swing.JFrame {
     private javax.swing.JLabel errorLabel;
     private javax.swing.JFileChooser fileChooser;
     private javax.swing.JLabel imageLabel;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenuBar jMenuBar1;
+    private javax.swing.JPanel jPanel1;
     private javax.swing.JTextField kValue;
     private javax.swing.JLabel outputImageLabel;
     private javax.swing.JMenuItem saveItem;
