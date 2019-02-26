@@ -2,6 +2,7 @@
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -11,6 +12,7 @@ import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -79,6 +81,9 @@ public class ColorCompressorGUI extends javax.swing.JFrame {
             }
         });
         kValue.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                kValueKeyPressed(evt);
+            }
             public void keyTyped(java.awt.event.KeyEvent evt) {
                 kValueKeyTyped(evt);
             }
@@ -282,6 +287,13 @@ public class ColorCompressorGUI extends javax.swing.JFrame {
             evt.consume();
         }
     }//GEN-LAST:event_kValueKeyTyped
+
+    private void kValueKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_kValueKeyPressed
+        if (evt.getKeyCode()==KeyEvent.VK_ENTER)
+        {
+            confirmButton.doClick();
+        }
+    }//GEN-LAST:event_kValueKeyPressed
 
     /**
      * @param args the command line arguments
