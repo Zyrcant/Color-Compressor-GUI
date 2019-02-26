@@ -75,11 +75,6 @@ public class ColorCompressorGUI extends javax.swing.JFrame {
         outputImageLabel.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
         outputImageLabel.setPreferredSize(new java.awt.Dimension(772, 663));
 
-        kValue.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                kValueActionPerformed(evt);
-            }
-        });
         kValue.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 kValueKeyPressed(evt);
@@ -209,14 +204,17 @@ public class ColorCompressorGUI extends javax.swing.JFrame {
             try 
             {
                 img = ImageIO.read(file);
-                //stores the read file into the class variable as well
-                originalImage = img;
-
                 //error checking for images that are too large
                 if(img.getHeight() * img.getWidth() > 8000000)
+                {
                     errorLabel.setText("ERROR: Image is too large. Please select an image less than 8 megapixels!");
+                }
                 else
                 {
+                    
+                    //stores the read file into the class variable as well
+                    originalImage = img;
+
                     //scale for the buffered image preview
                     double scale = Math.min(imageLabel.getHeight() * 1.0 / img.getHeight(), imageLabel.getWidth() * 1.0 / img.getWidth());
                     Image dimg = img.getScaledInstance((int)Math.floor(img.getWidth()*scale), (int)Math.floor(img.getHeight()*scale), Image.SCALE_SMOOTH);
@@ -240,22 +238,28 @@ public class ColorCompressorGUI extends javax.swing.JFrame {
         System.exit(0);
     }//GEN-LAST:event_ExitActionPerformed
 
-    private void kValueActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_kValueActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_kValueActionPerformed
-
     private void confirmButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_confirmButtonActionPerformed
         //flush any error messages
         errorLabel.setText("");
         
         int k = Integer.parseInt(kValue.getText());
-        if(k > 16777216)
-        {
-            errorLabel.setText("ERROR: That is in fact more colors than a computer can recognize!");
-        }
-        else if(originalImage == null)
+        if(originalImage == null)
         {
             errorLabel.setText("ERROR: There is no given image!");
+        }
+        else if(k > 50)
+        {
+            int dialogButton = JOptionPane.YES_NO_OPTION;
+            int dialogResult = JOptionPane.showConfirmDialog(this, "That's a lot of colors. You sure you want to do this?", "Warning", dialogButton);
+            if(dialogResult == 0)
+            {
+                BufferedImage kmeansJpg = kmeans_helper(originalImage,k);
+                postImage = kmeansJpg;
+                double scale = Math.min(imageLabel.getHeight() * 1.0 / kmeansJpg.getHeight(), imageLabel.getWidth() * 1.0 / kmeansJpg.getWidth());
+                Image dimg = kmeansJpg.getScaledInstance((int)Math.floor(kmeansJpg.getWidth()*scale), (int)Math.floor(kmeansJpg.getHeight()*scale), Image.SCALE_SMOOTH);
+                ImageIcon imageIcon = new ImageIcon(dimg);
+                outputImageLabel.setIcon(imageIcon);
+            }
         }
         else
         {
@@ -283,7 +287,7 @@ public class ColorCompressorGUI extends javax.swing.JFrame {
 
     private void kValueKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_kValueKeyTyped
         char enter = evt.getKeyChar();
-        if(!(Character.isDigit(enter)) || kValue.getText().length() > 8){
+        if(!(Character.isDigit(enter)) || kValue.getText().length() > 4){
             evt.consume();
         }
     }//GEN-LAST:event_kValueKeyTyped
