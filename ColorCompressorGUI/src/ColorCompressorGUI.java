@@ -3,9 +3,12 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -13,14 +16,9 @@ import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
-
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 
 /**
  *
@@ -28,9 +26,12 @@ import javax.swing.UnsupportedLookAndFeelException;
  */
 
 public class ColorCompressorGUI extends javax.swing.JFrame {
+
     //Stores the original image
     private BufferedImage originalImage = null;
     private BufferedImage postImage;
+    private static ArrayList<JPanel> list = new ArrayList<>();
+
     /**
      * Creates new form ColorCompressorGUI
      */
@@ -55,6 +56,16 @@ public class ColorCompressorGUI extends javax.swing.JFrame {
         confirmButton = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
         errorLabel = new javax.swing.JLabel();
+        paletteBackground = new javax.swing.JPanel();
+        paletteText = new javax.swing.JLabel();
+        palette1 = new javax.swing.JPanel();
+        list.add(palette1);
+        palette2 = new javax.swing.JPanel();
+        list.add(palette2);
+        palette3 = new javax.swing.JPanel();
+        list.add(palette3);
+        palette4 = new javax.swing.JPanel();
+        list.add(palette4);
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         Open = new javax.swing.JMenuItem();
@@ -100,6 +111,95 @@ public class ColorCompressorGUI extends javax.swing.JFrame {
         errorLabel.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
         errorLabel.setForeground(new java.awt.Color(255, 102, 102));
 
+        paletteBackground.setBackground(new java.awt.Color(153, 153, 153));
+
+        paletteText.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
+        paletteText.setText("Palette");
+
+        palette1.setPreferredSize(new java.awt.Dimension(25, 25));
+
+        javax.swing.GroupLayout palette1Layout = new javax.swing.GroupLayout(palette1);
+        palette1.setLayout(palette1Layout);
+        palette1Layout.setHorizontalGroup(
+            palette1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 25, Short.MAX_VALUE)
+        );
+        palette1Layout.setVerticalGroup(
+            palette1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 25, Short.MAX_VALUE)
+        );
+
+        palette2.setPreferredSize(new java.awt.Dimension(25, 25));
+
+        javax.swing.GroupLayout palette2Layout = new javax.swing.GroupLayout(palette2);
+        palette2.setLayout(palette2Layout);
+        palette2Layout.setHorizontalGroup(
+            palette2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 25, Short.MAX_VALUE)
+        );
+        palette2Layout.setVerticalGroup(
+            palette2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 25, Short.MAX_VALUE)
+        );
+
+        palette3.setPreferredSize(new java.awt.Dimension(25, 25));
+
+        javax.swing.GroupLayout palette3Layout = new javax.swing.GroupLayout(palette3);
+        palette3.setLayout(palette3Layout);
+        palette3Layout.setHorizontalGroup(
+            palette3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 25, Short.MAX_VALUE)
+        );
+        palette3Layout.setVerticalGroup(
+            palette3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 25, Short.MAX_VALUE)
+        );
+
+        palette4.setPreferredSize(new java.awt.Dimension(25, 25));
+
+        javax.swing.GroupLayout palette4Layout = new javax.swing.GroupLayout(palette4);
+        palette4.setLayout(palette4Layout);
+        palette4Layout.setHorizontalGroup(
+            palette4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 25, Short.MAX_VALUE)
+        );
+        palette4Layout.setVerticalGroup(
+            palette4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 25, Short.MAX_VALUE)
+        );
+
+        javax.swing.GroupLayout paletteBackgroundLayout = new javax.swing.GroupLayout(paletteBackground);
+        paletteBackground.setLayout(paletteBackgroundLayout);
+        paletteBackgroundLayout.setHorizontalGroup(
+            paletteBackgroundLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(paletteBackgroundLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(paletteBackgroundLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(paletteText)
+                    .addGroup(paletteBackgroundLayout.createSequentialGroup()
+                        .addComponent(palette1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(palette2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(palette3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(palette4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(64, Short.MAX_VALUE))
+        );
+        paletteBackgroundLayout.setVerticalGroup(
+            paletteBackgroundLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(paletteBackgroundLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(paletteText)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(paletteBackgroundLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(palette1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(palette2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(palette3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(palette4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -120,8 +220,10 @@ public class ColorCompressorGUI extends javax.swing.JFrame {
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addComponent(imageLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 772, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(18, 18, 18)
-                                .addComponent(outputImageLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 772, javax.swing.GroupLayout.PREFERRED_SIZE)))))
-                .addContainerGap(36, Short.MAX_VALUE))
+                                .addComponent(outputImageLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 772, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(28, 28, 28)
+                                .addComponent(paletteBackground, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                .addContainerGap(22, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -129,9 +231,10 @@ public class ColorCompressorGUI extends javax.swing.JFrame {
                 .addGap(18, 18, 18)
                 .addComponent(errorLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(imageLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 463, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(outputImageLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 463, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(imageLabel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 463, Short.MAX_VALUE)
+                    .addComponent(outputImageLabel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 463, Short.MAX_VALUE)
+                    .addComponent(paletteBackground, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGap(39, 39, 39)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(kValue, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -182,7 +285,9 @@ public class ColorCompressorGUI extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -192,6 +297,7 @@ public class ColorCompressorGUI extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    
     private void OpenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_OpenActionPerformed
         //flush the output image and any error messages
         outputImageLabel.setIcon(null);
@@ -244,6 +350,7 @@ public class ColorCompressorGUI extends javax.swing.JFrame {
         //flush any error messages
         errorLabel.setText("");
         int k = Integer.parseInt(kValue.getText());
+        boolean confirmation = true;
         if(originalImage == null)
         {
             errorLabel.setText("ERROR: There is no given image!");
@@ -252,17 +359,10 @@ public class ColorCompressorGUI extends javax.swing.JFrame {
         {
             int dialogButton = JOptionPane.YES_NO_OPTION;
             int dialogResult = JOptionPane.showConfirmDialog(this, "That's a lot of colors. You sure you want to do this?", "Warning", dialogButton);
-            if(dialogResult == 0)
-            {
-                BufferedImage kmeansJpg = kmeans_helper(originalImage,k);
-                postImage = kmeansJpg;
-                double scale = Math.min(imageLabel.getHeight() * 1.0 / kmeansJpg.getHeight(), imageLabel.getWidth() * 1.0 / kmeansJpg.getWidth());
-                Image dimg = kmeansJpg.getScaledInstance((int)Math.floor(kmeansJpg.getWidth()*scale), (int)Math.floor(kmeansJpg.getHeight()*scale), Image.SCALE_SMOOTH);
-                ImageIcon imageIcon = new ImageIcon(dimg);
-                outputImageLabel.setIcon(imageIcon);
-            }
+            if(dialogResult == 1)
+                confirmation = false;
         }
-        else
+        if(confirmation)
         {
             BufferedImage kmeansJpg = kmeans_helper(originalImage,k);
             postImage = kmeansJpg;
@@ -270,6 +370,7 @@ public class ColorCompressorGUI extends javax.swing.JFrame {
             Image dimg = kmeansJpg.getScaledInstance((int)Math.floor(kmeansJpg.getWidth()*scale), (int)Math.floor(kmeansJpg.getHeight()*scale), Image.SCALE_SMOOTH);
             ImageIcon imageIcon = new ImageIcon(dimg);
             outputImageLabel.setIcon(imageIcon);
+            
         }
     }//GEN-LAST:event_confirmButtonActionPerformed
 
@@ -467,10 +568,39 @@ public class ColorCompressorGUI extends javax.swing.JFrame {
                 }
             }
         }
+        //set the palette to allow user to change it
+        setPalette(kclusters);
+        
         //write the final values back to the new image
         for(int i = 0; i < rgb.length; i++)
         {
                 rgb[i] = kclusters[assignments[i]];
+        }
+    }
+    
+    private static void setPalette(int[] kclusters)
+    {
+        int k = kclusters.length;
+        for(int i = 0; i < k; i++)
+        {
+            if(i == list.size())
+                break;
+             //need to change the RGB integer value into Color
+            Color current = new Color(kclusters[i]);
+            list.get(i).setBackground(current);
+            MouseAdapterMod mam = new MouseAdapterMod();
+            list.get(i).addMouseListener(mam);
+        }
+    }
+    
+    public static class MouseAdapterMod extends MouseAdapter 
+    {
+        // usually better off with mousePressed rather than clicked
+        @Override
+        public void mousePressed(MouseEvent e) {
+            JPanel clickedPanel = (JPanel)e.getSource();
+            System.out.println(clickedPanel +"");
+            
         }
     }
     
@@ -487,6 +617,12 @@ public class ColorCompressorGUI extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JTextField kValue;
     private javax.swing.JLabel outputImageLabel;
+    private javax.swing.JPanel palette1;
+    private javax.swing.JPanel palette2;
+    private javax.swing.JPanel palette3;
+    private javax.swing.JPanel palette4;
+    private javax.swing.JPanel paletteBackground;
+    private javax.swing.JLabel paletteText;
     private javax.swing.JMenuItem saveItem;
     // End of variables declaration//GEN-END:variables
 }
