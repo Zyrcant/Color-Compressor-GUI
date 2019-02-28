@@ -39,12 +39,19 @@ public class ColorCompressorGUI extends javax.swing.JFrame {
     private static BufferedImage postImage;
     private static ArrayList<JPanel> list = new ArrayList<>();
     private static int[] assignments;
+    private static ArrayList<Object[]> history;
+    private static int histIndex;
+    
     /**
      * Creates new form ColorCompressorGUI
      */
     public ColorCompressorGUI() {
         initComponents();
         hidePalettes();
+        this.setTitle("Color Compressor");
+        BufferedImage img = null;
+        try {img = ImageIO.read(getClass().getResource("images/bunny_boy.png"));} catch (IOException e) {System.out.println(e);}
+        this.setIconImage(img);
     }
 
     /**
@@ -171,6 +178,9 @@ public class ColorCompressorGUI extends javax.swing.JFrame {
         Open = new javax.swing.JMenuItem();
         saveItem = new javax.swing.JMenuItem();
         Exit = new javax.swing.JMenuItem();
+        jMenu2 = new javax.swing.JMenu();
+        undo = new javax.swing.JMenuItem();
+        redo = new javax.swing.JMenuItem();
 
         fileChooser.setDialogTitle("Choose your image");
         fileChooser.setFileFilter(new ImageFilter());
@@ -1085,7 +1095,7 @@ public class ColorCompressorGUI extends javax.swing.JFrame {
                                 .addGap(18, 18, 18)
                                 .addComponent(outputImageLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 772, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(28, 28, 28)
-                                .addComponent(paletteBackground, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))))
+                                .addComponent(paletteBackground, javax.swing.GroupLayout.PREFERRED_SIZE, 189, javax.swing.GroupLayout.PREFERRED_SIZE)))))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
@@ -1142,13 +1152,37 @@ public class ColorCompressorGUI extends javax.swing.JFrame {
 
         jMenuBar1.add(jMenu1);
 
+        jMenu2.setText("Edit");
+
+        undo.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_Z, java.awt.event.InputEvent.CTRL_MASK));
+        undo.setText("Undo");
+        undo.setEnabled(false);
+        undo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                undoActionPerformed(evt);
+            }
+        });
+        jMenu2.add(undo);
+
+        redo.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_Y, java.awt.event.InputEvent.CTRL_MASK));
+        redo.setText("Redo");
+        redo.setEnabled(false);
+        redo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                redoActionPerformed(evt);
+            }
+        });
+        jMenu2.add(redo);
+
+        jMenuBar1.add(jMenu2);
+
         setJMenuBar(jMenuBar1);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1206,6 +1240,49 @@ public class ColorCompressorGUI extends javax.swing.JFrame {
         System.exit(0);
     }//GEN-LAST:event_ExitActionPerformed
 
+    private void saveItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveItemActionPerformed
+        javax.swing.JFileChooser saver = new javax.swing.JFileChooser();
+        saver.setDialogTitle("Save As");
+        saver.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("Image documents(*.jpg or *.png)", "jpg", "png"));
+        int returnVal = saver.showSaveDialog(this);
+        if (returnVal == JFileChooser.APPROVE_OPTION){
+            String path = saver.getSelectedFile().getAbsolutePath();
+            if (path.lastIndexOf('.') == -1)
+                path += fileChooser.getSelectedFile().getAbsolutePath().substring(fileChooser.getSelectedFile().getAbsolutePath().lastIndexOf('.'));
+            File save = new File(path);
+            //sometimes encoding a png as a jpg will mess it up
+            String format = "jpg";
+            if(fileChooser.getSelectedFile().getAbsolutePath().endsWith(".png") || save.getAbsolutePath().endsWith(".png"))
+                format = "png";
+                
+            try {
+                ImageIO.write(postImage, format, save);
+            } catch (IOException ex) {
+                Logger.getLogger(ColorCompressorGUI.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }//GEN-LAST:event_saveItemActionPerformed
+
+    private void redoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_redoActionPerformed
+        // TODO add your handling code here:
+        if(histIndex >= history.size()) return;
+        Object[] hist = history.get(histIndex++);
+        paintCluster((Color)hist[2], (int)hist[0]);
+        ((JPanel)hist[3]).setBackground((Color)hist[2]);
+        if(!undo.isEnabled()) undo.setEnabled(true);
+        if(histIndex >= history.size()) redo.setEnabled(false);
+    }//GEN-LAST:event_redoActionPerformed
+
+    private void undoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_undoActionPerformed
+        // TODO add your handling code here:
+        if(histIndex <= 0) return;
+        Object[] hist = history.get(--histIndex);
+        paintCluster((Color)hist[1], (int)hist[0]);
+        ((JPanel)hist[3]).setBackground((Color)hist[1]);
+        if(!redo.isEnabled()) redo.setEnabled(true);
+        if(histIndex == 0) undo.setEnabled(false);
+    }//GEN-LAST:event_undoActionPerformed
+
     private void confirmButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_confirmButtonActionPerformed
         //flush any error messages
         errorLabel.setText("");
@@ -1230,6 +1307,10 @@ public class ColorCompressorGUI extends javax.swing.JFrame {
         }
         else
         {
+            history = new ArrayList<Object[]>();
+            histIndex = 0;
+            if(redo.isEnabled()) redo.setEnabled(false);
+            if(undo.isEnabled()) undo.setEnabled(false);
             hidePalettes();
             showUsefulPalettes(k);
             BufferedImage kmeansJpg = kmeans_helper(originalImage,k);
@@ -1240,22 +1321,6 @@ public class ColorCompressorGUI extends javax.swing.JFrame {
             outputImageLabel.setIcon(imageIcon);
         }
     }//GEN-LAST:event_confirmButtonActionPerformed
-
-    private void saveItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveItemActionPerformed
-        int returnVal = fileChooser.showOpenDialog(this);
-        if (returnVal == JFileChooser.APPROVE_OPTION){ 
-            File file = fileChooser.getSelectedFile();
-            try {
-                //sometimes encoding a png as a jpg will mess it up
-                if(file.getAbsolutePath().endsWith(".png"))
-                    ImageIO.write(postImage, "png", file);
-                else
-                    ImageIO.write(postImage, "jpg", file);
-            } catch (IOException ex) {
-                Logger.getLogger(ColorCompressorGUI.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-    }//GEN-LAST:event_saveItemActionPerformed
 
     private void kValueKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_kValueKeyTyped
         char enter = evt.getKeyChar();
@@ -1311,7 +1376,8 @@ public class ColorCompressorGUI extends javax.swing.JFrame {
         @Override
         public boolean accept(File file) {
             // Allow only directories, or files with a raster image extension
-            return file.isDirectory() || file.getAbsolutePath().endsWith(".png") || file.getAbsolutePath().endsWith(".jpg") || file.getAbsolutePath().endsWith(".JPG") || file.getAbsolutePath().endsWith(".PNG") || file.getAbsolutePath().endsWith(".jpeg") || file.getAbsolutePath().endsWith(".JPEG");
+            return file.isDirectory() || file.getAbsolutePath().matches(".*[.](([pP][Nn])|([jJ][pP]([eE])?))[Gg]");
+//            return file.isDirectory() || file.getAbsolutePath().endsWith(".png") || file.getAbsolutePath().endsWith(".jpg") || file.getAbsolutePath().endsWith(".JPG") || file.getAbsolutePath().endsWith(".PNG") || file.getAbsolutePath().endsWith(".jpeg") || file.getAbsolutePath().endsWith(".JPEG");
         }
         @Override
         public String getDescription() {
@@ -1328,26 +1394,22 @@ public class ColorCompressorGUI extends javax.swing.JFrame {
         Graphics2D g = kmeansImage.createGraphics();
         g.drawImage(originalImage, 0, 0, w,h , null);
         // Read rgb values from the image
-        int[] rgb=new int[w*h];
-        int count=0;
-        for(int i=0;i<w;i++)
-        {
-                for(int j=0;j<h;j++)
-                {
-                        rgb[count++]=kmeansImage.getRGB(i,j);
-                }
-        }
+        int[] rgb = new int[w*h];
+        int count = 0;
+        for(int i = 0; i < w; i++)
+            for(int j = 0; j < h; j++)
+                rgb[count++] = kmeansImage.getRGB(i,j);
         // Call kmeans algorithm: update the rgb values
-        kmeans(rgb,k);
+        kmeans(rgb, k);
 
         // Write the new rgb values to the image
-        count=0;
-        for(int i=0;i<w;i++)
+        count = 0;
+        for(int i = 0; i < w; i++)
         {
-                for(int j=0;j<h;j++)
-                {
-                        kmeansImage.setRGB(i,j,rgb[count++]);
-                }
+            for(int j = 0; j < h; j++)
+            {
+                kmeansImage.setRGB(i, j, rgb[count++]);
+            }
         }
         return kmeansImage;
     }
@@ -1360,7 +1422,7 @@ public class ColorCompressorGUI extends javax.swing.JFrame {
         assignments = new int[rgb.length];
         Random rand = new Random();
         for(int i = 0; i < kclusters.length; i++)
-                kclusters[i] = rgb[rand.nextInt(rgb.length)];
+            kclusters[i] = rgb[rand.nextInt(rgb.length)];
 
         //hard number of iterations
         int iterations = 30;
@@ -1391,8 +1453,8 @@ public class ColorCompressorGUI extends javax.swing.JFrame {
                     //find the closest in regards to all values. values are multiplied in case some are negative
                     if(Math.sqrt(dBlue*dBlue + dGreen*dGreen + dRed*dRed) < min)
                     {
-                            min = Math.sqrt(dBlue*dBlue + dGreen*dGreen + dRed*dRed);
-                            minIndex = j;
+                        min = Math.sqrt(dBlue*dBlue + dGreen*dGreen + dRed*dRed);
+                        minIndex = j;
                     }
                 }
                 //save the cluster assignment
@@ -1420,6 +1482,7 @@ public class ColorCompressorGUI extends javax.swing.JFrame {
                         count++;
                     }
                 }
+                
                 //sometimes the count may be 0, if so set a new cluster
                 if(count == 0)
                 {
@@ -1440,27 +1503,23 @@ public class ColorCompressorGUI extends javax.swing.JFrame {
 
         //write the final values back to the new image
         for(int i = 0; i < rgb.length; i++)
-        {
-                rgb[i] = kclusters[assignments[i]];
-        }
+            rgb[i] = kclusters[assignments[i]];
     }
     
     private void hidePalettes() {
         for(JPanel jp : list) {
             jp.setVisible(false);
-            //jp.setEnabled(false);
+            if(jp.getMouseListeners().length > 0)
+                jp.removeMouseListener(jp.getMouseListeners()[0]);
         }
     }
     
     private void showUsefulPalettes(int k) {
-        if(k > 50)
-            return;
+        if(k > 50) return;
         for(int i = 0; i < k; i++) {
             if( i == list.size()) break;
-            //list.get(i).setEnabled(true);
             list.get(i).setVisible(true);
         }
-        return;
     }
     
     private static void setPalette(int[] kclusters)
@@ -1478,6 +1537,35 @@ public class ColorCompressorGUI extends javax.swing.JFrame {
         }
     }
     
+    private static void paintCluster(Color c, int k) {
+        int w = postImage.getWidth();
+        int h = postImage.getHeight();
+        BufferedImage newImage = new BufferedImage(w,h,postImage.getType());
+        Graphics2D g = newImage.createGraphics();
+        g.drawImage(postImage, 0, 0, w,h , null);
+        // Read rgb values from the image
+        int[] rgb = new int[w*h];
+        int count = 0;
+        for(int i = 0; i < w; i++)
+            for(int j = 0; j < h; j++)
+                rgb[count++] = newImage.getRGB(i,j);
+                
+        //checks if the pixel belongs to the cluster that we want to replace
+        for(int i = 0; i < rgb.length; i++)
+            if(assignments[i] == k)
+                rgb[i] = c.getRGB();
+                
+        //set the post image
+        count = 0;
+        for(int i = 0; i < w; i++)
+            for(int j = 0; j < h; j++)
+                postImage.setRGB(i, j, rgb[count++]);
+
+        Image dimg = postImage.getScaledInstance((int)Math.floor(postImage.getWidth()*scale), (int)Math.floor(postImage.getHeight()*scale), Image.SCALE_SMOOTH);
+        ImageIcon imageIcon = new ImageIcon(dimg);
+        outputImageLabel.setIcon(imageIcon);
+    }
+    
     public static class MouseAdapterMod extends MouseAdapter 
     {
         // usually better off with mousePressed rather than clicked
@@ -1491,37 +1579,13 @@ public class ColorCompressorGUI extends javax.swing.JFrame {
             {
                 Color oldC = clickedPanel.getBackground();
                 clickedPanel.setBackground(newC);
-                int w = postImage.getWidth();
-                int h = postImage.getHeight();
-                BufferedImage newImage = new BufferedImage(w,h,postImage.getType());
-                Graphics2D g = newImage.createGraphics();
-                g.drawImage(postImage, 0, 0, w,h , null);
-                // Read rgb values from the image
-                int[] rgb=new int[w*h];
-                int count=0;
-                for(int i=0;i<w;i++)
-                {
-                        for(int j=0;j<h;j++)
-                            rgb[count++]=newImage.getRGB(i,j);
-                }
-                
-                //checks if the pixel belongs to the cluster that we want to replace
-                for(int i = 0; i < rgb.length; i++)
-                {
-                    if(assignments[i] == panelIndex)
-                        rgb[i] = newC.getRGB();
-                }
-                
-                //set the post image
-                count=0;
-                for(int i=0;i<w;i++)
-                {
-                    for(int j=0;j<h;j++)
-                        postImage.setRGB(i,j,rgb[count++]);
-                }
-                Image dimg = postImage.getScaledInstance((int)Math.floor(postImage.getWidth()*scale), (int)Math.floor(postImage.getHeight()*scale), Image.SCALE_SMOOTH);
-                ImageIcon imageIcon = new ImageIcon(dimg);
-                outputImageLabel.setIcon(imageIcon);
+                paintCluster(newC, panelIndex);
+                if(histIndex < history.size())
+                    history.subList(histIndex, history.size()).clear();
+                history.add(new Object[]{panelIndex,oldC,newC, clickedPanel});
+                histIndex++;
+                redo.setEnabled(false);
+                if(!undo.isEnabled()) undo.setEnabled(true);
             }
         }
     }
@@ -1535,6 +1599,7 @@ public class ColorCompressorGUI extends javax.swing.JFrame {
     private javax.swing.JLabel imageLabel;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JMenu jMenu1;
+    private javax.swing.JMenu jMenu2;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JTextField kValue;
@@ -1591,6 +1656,8 @@ public class ColorCompressorGUI extends javax.swing.JFrame {
     private javax.swing.JPanel palette9;
     private javax.swing.JPanel paletteBackground;
     private javax.swing.JLabel paletteText;
+    private static javax.swing.JMenuItem redo;
     private javax.swing.JMenuItem saveItem;
+    private static javax.swing.JMenuItem undo;
     // End of variables declaration//GEN-END:variables
 }
