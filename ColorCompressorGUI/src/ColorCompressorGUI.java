@@ -1358,8 +1358,7 @@ public class ColorCompressorGUI extends javax.swing.JFrame {
         Random rand = new Random();
         for(int i = 0; i < kclusters.length; i++)
                 kclusters[i] = rgb[rand.nextInt(rgb.length)];
-
-        //hard number of iterations
+//hard number of iterations
         int iterations = 30;
 
         //current pixel to be assigned to a cluster
@@ -1445,7 +1444,8 @@ public class ColorCompressorGUI extends javax.swing.JFrame {
     private void hidePalettes() {
         for(JPanel jp : list) {
             jp.setVisible(false);
-            //jp.setEnabled(false);
+            if(jp.getMouseListeners().length > 0)
+                jp.removeMouseListener(jp.getMouseListeners()[0]);
         }
     }
 
@@ -1486,7 +1486,6 @@ public class ColorCompressorGUI extends javax.swing.JFrame {
             Color newC = JColorChooser.showDialog(clickedPanel, "Choose new color", clickedPanel.getBackground());
             if(newC != null)
             {
-                Color oldC = clickedPanel.getBackground();
                 clickedPanel.setBackground(newC);
                 int w = postImage.getWidth();
                 int h = postImage.getHeight();
