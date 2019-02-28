@@ -35,6 +35,7 @@ import javax.swing.UnsupportedLookAndFeelException;
 public class ColorCompressorGUI extends javax.swing.JFrame {
     //Stores the original image
     private BufferedImage originalImage = null;
+    private static double scale;
     private static BufferedImage postImage;
     private static ArrayList<JPanel> list = new ArrayList<>();
     private static int[] assignments;
@@ -1221,8 +1222,8 @@ public class ColorCompressorGUI extends javax.swing.JFrame {
             {
                 BufferedImage kmeansJpg = kmeans_helper(originalImage,k);
                 postImage = kmeansJpg;
-                double scale = Math.min(imageLabel.getHeight() * 1.0 / kmeansJpg.getHeight(), imageLabel.getWidth() * 1.0 / kmeansJpg.getWidth());
-                Image dimg = kmeansJpg.getScaledInstance((int)Math.floor(kmeansJpg.getWidth()*scale), (int)Math.floor(kmeansJpg.getHeight()*scale), Image.SCALE_SMOOTH);
+                scale = Math.min(imageLabel.getHeight() * 1.0 / kmeansJpg.getHeight(), imageLabel.getWidth() * 1.0 / kmeansJpg.getWidth());
+                Image dimg = postImage.getScaledInstance((int)Math.floor(postImage.getWidth()*scale), (int)Math.floor(postImage.getHeight()*scale), Image.SCALE_SMOOTH);
                 ImageIcon imageIcon = new ImageIcon(dimg);
                 outputImageLabel.setIcon(imageIcon);
             }
@@ -1233,8 +1234,8 @@ public class ColorCompressorGUI extends javax.swing.JFrame {
             showUsefulPalettes(k);
             BufferedImage kmeansJpg = kmeans_helper(originalImage,k);
             postImage = kmeansJpg;
-            double scale = Math.min(imageLabel.getHeight() * 1.0 / kmeansJpg.getHeight(), imageLabel.getWidth() * 1.0 / kmeansJpg.getWidth());
-            Image dimg = kmeansJpg.getScaledInstance((int)Math.floor(kmeansJpg.getWidth()*scale), (int)Math.floor(kmeansJpg.getHeight()*scale), Image.SCALE_SMOOTH);
+            scale = Math.min(imageLabel.getHeight() * 1.0 / kmeansJpg.getHeight(), imageLabel.getWidth() * 1.0 / kmeansJpg.getWidth());
+            Image dimg = postImage.getScaledInstance((int)Math.floor(postImage.getWidth()*scale), (int)Math.floor(postImage.getHeight()*scale), Image.SCALE_SMOOTH);
             ImageIcon imageIcon = new ImageIcon(dimg);
             outputImageLabel.setIcon(imageIcon);
         }
@@ -1434,6 +1435,9 @@ public class ColorCompressorGUI extends javax.swing.JFrame {
                 }
             }
         }
+        //set the palette to allow user to change it
+        setPalette(kclusters);
+
         //write the final values back to the new image
         for(int i = 0; i < rgb.length; i++)
         {
@@ -1481,6 +1485,7 @@ public class ColorCompressorGUI extends javax.swing.JFrame {
         public void mousePressed(MouseEvent e) {
             JPanel clickedPanel = (JPanel)e.getSource();
             System.out.println(clickedPanel +"");
+            int panelIndex = list.indexOf(clickedPanel);
             Color newC = JColorChooser.showDialog(clickedPanel, "Choose new color", clickedPanel.getBackground());
             if(newC != null)
             {
@@ -1500,10 +1505,10 @@ public class ColorCompressorGUI extends javax.swing.JFrame {
                             rgb[count++]=newImage.getRGB(i,j);
                 }
                 
-                //checks if the pixel is the color that we want to replace
+                //checks if the pixel belongs to the cluster that we want to replace
                 for(int i = 0; i < rgb.length; i++)
                 {
-                    if(rgb[i] == oldC.getRGB())
+                    if(assignments[i] == panelIndex)
                         rgb[i] = newC.getRGB();
                 }
                 
@@ -1511,9 +1516,12 @@ public class ColorCompressorGUI extends javax.swing.JFrame {
                 count=0;
                 for(int i=0;i<w;i++)
                 {
-                        for(int j=0;j<h;j++)
-                                postImage.setRGB(i,j,rgb[count++]);
+                    for(int j=0;j<h;j++)
+                        postImage.setRGB(i,j,rgb[count++]);
                 }
+                Image dimg = postImage.getScaledInstance((int)Math.floor(postImage.getWidth()*scale), (int)Math.floor(postImage.getHeight()*scale), Image.SCALE_SMOOTH);
+                ImageIcon imageIcon = new ImageIcon(dimg);
+                outputImageLabel.setIcon(imageIcon);
             }
         }
     }
@@ -1530,7 +1538,7 @@ public class ColorCompressorGUI extends javax.swing.JFrame {
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JTextField kValue;
-    private javax.swing.JLabel outputImageLabel;
+    private static javax.swing.JLabel outputImageLabel;
     private javax.swing.JPanel palette1;
     private javax.swing.JPanel palette10;
     private javax.swing.JPanel palette11;
