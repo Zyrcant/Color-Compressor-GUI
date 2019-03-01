@@ -1192,6 +1192,10 @@ public class ColorCompressorGUI extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    /**
+     * Opens a file chooser to select an image under 8MP for the program to edit.
+     * @param evt ActionEvent identity is irrelevant in this context
+     */
     private void OpenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_OpenActionPerformed
         //flush the output image and any error messages
         outputImageLabel.setIcon(null);
@@ -1213,7 +1217,6 @@ public class ColorCompressorGUI extends javax.swing.JFrame {
                 }
                 else
                 {
-                    
                     //stores the read file into the class variable as well
                     originalImage = img;
 
@@ -1236,10 +1239,18 @@ public class ColorCompressorGUI extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_jMenu1ActionPerformed
 
+    /**
+     * Exits the program 
+     * @param evt ActionEvent identity is irrelevant in this context
+     */
     private void ExitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ExitActionPerformed
         System.exit(0);
     }//GEN-LAST:event_ExitActionPerformed
 
+    /**
+     * Opens up a save window to save the processed image.
+     * @param evt ActionEvent identity is irrelevant in this context
+     */
     private void saveItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveItemActionPerformed
         javax.swing.JFileChooser saver = new javax.swing.JFileChooser();
         saver.setDialogTitle("Save As");
@@ -1263,6 +1274,10 @@ public class ColorCompressorGUI extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_saveItemActionPerformed
 
+    /**
+     * Redoes the last palette color change and re-enables the undo button
+     * @param evt ActionEvent identity is irrelevant in this context
+     */
     private void redoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_redoActionPerformed
         // TODO add your handling code here:
         if(histIndex >= history.size()) return;
@@ -1273,6 +1288,10 @@ public class ColorCompressorGUI extends javax.swing.JFrame {
         if(histIndex >= history.size()) redo.setEnabled(false);
     }//GEN-LAST:event_redoActionPerformed
 
+    /**
+     * Undoes the last palette color change and re-enables the redo button
+     * @param evt ActionEvent identity is irrelevant in this context
+     */
     private void undoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_undoActionPerformed
         // TODO add your handling code here:
         if(histIndex <= 0) return;
@@ -1283,6 +1302,10 @@ public class ColorCompressorGUI extends javax.swing.JFrame {
         if(histIndex == 0) undo.setEnabled(false);
     }//GEN-LAST:event_undoActionPerformed
 
+    /**
+     * Runs K Means on the image with the given K value in the field, resets history, and sets palettes
+     * @param evt ActionEvent identity is irrelevant in this context
+     */
     private void confirmButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_confirmButtonActionPerformed
         //flush any error messages
         errorLabel.setText("");
@@ -1294,7 +1317,7 @@ public class ColorCompressorGUI extends javax.swing.JFrame {
         else if(k > 50)
         {
             int dialogButton = JOptionPane.YES_NO_OPTION;
-            int dialogResult = JOptionPane.showConfirmDialog(this, "That's a lot of colors. You sure you want to do this?", "Warning", dialogButton);
+            int dialogResult = JOptionPane.showConfirmDialog(this, "That's a lot of colors. Palettes will not be displayed. Are you sure you want to do this?", "Warning", dialogButton);
             if(dialogResult == 0)
             {
                 BufferedImage kmeansJpg = kmeans_helper(originalImage,k);
@@ -1312,7 +1335,7 @@ public class ColorCompressorGUI extends javax.swing.JFrame {
             if(redo.isEnabled()) redo.setEnabled(false);
             if(undo.isEnabled()) undo.setEnabled(false);
             hidePalettes();
-            showUsefulPalettes(k);
+            showPalettes(k);
             BufferedImage kmeansJpg = kmeans_helper(originalImage,k);
             postImage = kmeansJpg;
             scale = Math.min(imageLabel.getHeight() * 1.0 / kmeansJpg.getHeight(), imageLabel.getWidth() * 1.0 / kmeansJpg.getWidth());
@@ -1322,6 +1345,10 @@ public class ColorCompressorGUI extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_confirmButtonActionPerformed
 
+    /**
+     * Prevents adding non-digit characters or numbers over 4 digits long
+     * @param evt KeyEvent of user typing in the kField 
+     */
     private void kValueKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_kValueKeyTyped
         char enter = evt.getKeyChar();
         if(!(Character.isDigit(enter)) || kValue.getText().length() > 4){
@@ -1329,11 +1356,13 @@ public class ColorCompressorGUI extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_kValueKeyTyped
 
+    /**
+     * Checks to see if user hits center while focused on the kField
+     * @param evt KeyEvent of user pressing a key in the kField
+     */
     private void kValueKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_kValueKeyPressed
-        if (evt.getKeyCode()==KeyEvent.VK_ENTER)
-        {
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER)
             confirmButton.doClick();
-        }
     }//GEN-LAST:event_kValueKeyPressed
 
     /**
@@ -1372,12 +1401,14 @@ public class ColorCompressorGUI extends javax.swing.JFrame {
         });
     }
 
-    class ImageFilter extends javax.swing.filechooser.FileFilter {
+    /**
+     * Filter to only allow viewing of folders and JPG/PNG images
+     */
+    public class ImageFilter extends javax.swing.filechooser.FileFilter {
         @Override
         public boolean accept(File file) {
             // Allow only directories, or files with a raster image extension
-            return file.isDirectory() || file.getAbsolutePath().matches(".*[.](([pP][Nn])|([jJ][pP]([eE])?))[Gg]");
-//            return file.isDirectory() || file.getAbsolutePath().endsWith(".png") || file.getAbsolutePath().endsWith(".jpg") || file.getAbsolutePath().endsWith(".JPG") || file.getAbsolutePath().endsWith(".PNG") || file.getAbsolutePath().endsWith(".jpeg") || file.getAbsolutePath().endsWith(".JPEG");
+            return file.isDirectory() || file.getAbsolutePath().endsWith(".png") || file.getAbsolutePath().endsWith(".jpg") || file.getAbsolutePath().endsWith(".JPG") || file.getAbsolutePath().endsWith(".PNG") || file.getAbsolutePath().endsWith(".jpeg") || file.getAbsolutePath().endsWith(".JPEG");
         }
         @Override
         public String getDescription() {
@@ -1386,7 +1417,13 @@ public class ColorCompressorGUI extends javax.swing.JFrame {
         }
     } 
     
-    private static BufferedImage kmeans_helper(BufferedImage originalImage, int k)
+    /**
+     * Pulls RGB array from the originalImage and runs the K Means algorithm on it
+     * @param originalImage BufferedImage to run the K Means algorithm on
+     * @param k Number of Clusters to use for the K Means algorithm
+     * @return BufferedImage containing updated RGB values from K Means
+     */
+    public static BufferedImage kmeans_helper(BufferedImage originalImage, int k)
     {
         int w = originalImage.getWidth();
         int h = originalImage.getHeight();
@@ -1399,22 +1436,24 @@ public class ColorCompressorGUI extends javax.swing.JFrame {
         for(int i = 0; i < w; i++)
             for(int j = 0; j < h; j++)
                 rgb[count++] = kmeansImage.getRGB(i,j);
+        
         // Call kmeans algorithm: update the rgb values
         kmeans(rgb, k);
 
         // Write the new rgb values to the image
         count = 0;
         for(int i = 0; i < w; i++)
-        {
             for(int j = 0; j < h; j++)
-            {
                 kmeansImage.setRGB(i, j, rgb[count++]);
-            }
-        }
+        
         return kmeansImage;
     }
     
-     // Update the array rgb by assigning each entry in the rgb array to its cluster center
+    /**
+     * Update the RGB array by assigning each entry in the RGB array to a cluster center
+     * @param rgb Array of each pixels RGB values
+     * @param k Number of cluster centers to create
+     */
     private static void kmeans(int[] rgb, int k)
     {
         //assign k random clusters
@@ -1506,6 +1545,9 @@ public class ColorCompressorGUI extends javax.swing.JFrame {
             rgb[i] = kclusters[assignments[i]];
     }
     
+    /**
+     * Hides all of the palettes and removes their MouseListeners
+     */
     private void hidePalettes() {
         for(JPanel jp : list) {
             jp.setVisible(false);
@@ -1514,7 +1556,11 @@ public class ColorCompressorGUI extends javax.swing.JFrame {
         }
     }
     
-    private void showUsefulPalettes(int k) {
+    /**
+     * Sets the palettes to be visible
+     * @param k  number of palettes to show
+     */
+    private void showPalettes(int k) {
         if(k > 50) return;
         for(int i = 0; i < k; i++) {
             if( i == list.size()) break;
@@ -1522,6 +1568,10 @@ public class ColorCompressorGUI extends javax.swing.JFrame {
         }
     }
     
+    /**
+     * Sets the colors of the palettes and adds a MouseListener onto them
+     * @param kclusters array containing the cluster
+     */
     private static void setPalette(int[] kclusters)
     {
         int k = kclusters.length;
@@ -1537,7 +1587,12 @@ public class ColorCompressorGUI extends javax.swing.JFrame {
         }
     }
     
-    private static void paintCluster(Color c, int k) {
+    /**
+     * Changes the color of all pixels belonging to a particular cluster and displays it
+     * @param c Color to change the pixels of the cluster to
+     * @param k Cluster to change the colors of the pixels for
+     */
+    public static void paintCluster(Color c, int k) {
         int w = postImage.getWidth();
         int h = postImage.getHeight();
         BufferedImage newImage = new BufferedImage(w,h,postImage.getType());
@@ -1566,6 +1621,9 @@ public class ColorCompressorGUI extends javax.swing.JFrame {
         outputImageLabel.setIcon(imageIcon);
     }
     
+    /**
+     * MouseAdapter used to select and change the color palette of the compressed image
+     */
     public static class MouseAdapterMod extends MouseAdapter 
     {
         // usually better off with mousePressed rather than clicked
