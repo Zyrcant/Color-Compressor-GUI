@@ -6,7 +6,7 @@ Uses the K-means clustering algorithm to compress images in terms of both size a
 
 # Sample Usage
 
-![](https://i.imgur.com/PihbF4q.pn)
+![](https://i.imgur.com/PihbF4q.png)
 Built in file system support for opening and saving images.
 
 In version v1.2, you now have the ability to select the colors chosen by the algorithm and change them to any color desired.
