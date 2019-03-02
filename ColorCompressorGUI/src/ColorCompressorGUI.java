@@ -1647,65 +1647,6 @@ public class ColorCompressorGUI extends javax.swing.JFrame {
         }
     }
     
-    private static void setPalette(int[] kclusters)
-    {
-        int k = kclusters.length;
-        for(int i = 0; i < k; i++)
-        {
-            if(i == list.size())
-                break;
-             //need to change the RGB integer value into Color
-            Color current = new Color(kclusters[i]);
-            list.get(i).setBackground(current);
-            MouseAdapterMod mam = new MouseAdapterMod();
-            list.get(i).addMouseListener(mam);
-        }
-    }
-    
-    public static class MouseAdapterMod extends MouseAdapter 
-    {
-        // usually better off with mousePressed rather than clicked
-        @Override
-        public void mousePressed(MouseEvent e) {
-            JPanel clickedPanel = (JPanel)e.getSource();
-            System.out.println(clickedPanel +"");
-            Color newC = JColorChooser.showDialog(clickedPanel, "Choose new color", clickedPanel.getBackground());
-            if(newC != null)
-            {
-                Color oldC = clickedPanel.getBackground();
-                clickedPanel.setBackground(newC);
-                int w = postImage.getWidth();
-                int h = postImage.getHeight();
-                BufferedImage newImage = new BufferedImage(w,h,postImage.getType());
-                Graphics2D g = newImage.createGraphics();
-                g.drawImage(postImage, 0, 0, w,h , null);
-                // Read rgb values from the image
-                int[] rgb=new int[w*h];
-                int count=0;
-                for(int i=0;i<w;i++)
-                {
-                        for(int j=0;j<h;j++)
-                            rgb[count++]=newImage.getRGB(i,j);
-                }
-                
-                //checks if the pixel is the color that we want to replace
-                for(int i = 0; i < rgb.length; i++)
-                {
-                    if(rgb[i] == oldC.getRGB())
-                        rgb[i] = newC.getRGB();
-                }
-                
-                //set the post image
-                count=0;
-                for(int i=0;i<w;i++)
-                {
-                        for(int j=0;j<h;j++)
-                                postImage.setRGB(i,j,rgb[count++]);
-                }
-            }
-        }
-    }
-    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem Exit;
     private javax.swing.JMenuItem Open;
