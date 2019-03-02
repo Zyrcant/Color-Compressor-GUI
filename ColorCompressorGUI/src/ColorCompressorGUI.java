@@ -177,8 +177,9 @@ public class ColorCompressorGUI extends javax.swing.JFrame {
         undo = new javax.swing.JMenuItem();
         redo = new javax.swing.JMenuItem();
 
+        fileChooser.setCurrentDirectory(new java.io.File("C:\\Users\\Korbo\\Pictures"));
         fileChooser.setDialogTitle("Choose your image");
-        fileChooser.setFileFilter(new ImageFilter());
+        fileChooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("Image documents(*.jpg or *.png)", "jpg", "jpeg", "png"));
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setBackground(new java.awt.Color(102, 102, 102));
@@ -1194,12 +1195,14 @@ public class ColorCompressorGUI extends javax.swing.JFrame {
      * @param evt ActionEvent identity is irrelevant in this context
      */
     private void OpenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_OpenActionPerformed
-        //flush the output image and any error messages
-        outputImageLabel.setIcon(null);
+        //flush any error messages
         errorLabel.setText("");
         
         int returnVal = fileChooser.showOpenDialog(this);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
+            //flush the images
+            outputImageLabel.setIcon(null);
+            
             File file = fileChooser.getSelectedFile();
         
             // buffered image preview
@@ -1251,7 +1254,7 @@ public class ColorCompressorGUI extends javax.swing.JFrame {
     private void saveItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveItemActionPerformed
         javax.swing.JFileChooser saver = new javax.swing.JFileChooser();
         saver.setDialogTitle("Save As");
-        saver.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("Image documents(*.jpg or *.png)", "jpg", "png"));
+        saver.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("Image documents(*.jpg or *.png)", "jpg", "jpeg", "png"));
         int returnVal = saver.showSaveDialog(this);
         if (returnVal == JFileChooser.APPROVE_OPTION){
             String path = saver.getSelectedFile().getAbsolutePath();
@@ -1311,20 +1314,13 @@ public class ColorCompressorGUI extends javax.swing.JFrame {
         if(originalImage == null)
         {
             errorLabel.setText("ERROR: There is no given image!");
+            confirmation = false;
         }
         else if(k > 50)
         {
             int dialogButton = JOptionPane.YES_NO_OPTION;
             int dialogResult = JOptionPane.showConfirmDialog(this, "That's a lot of colors. Palettes will not be displayed. Are you sure you want to do this?", "Warning", dialogButton);
-            if(dialogResult == 0)
-            {
-                BufferedImage kmeansJpg = kmeans_helper(originalImage,k);
-                postImage = kmeansJpg;
-                scale = Math.min(imageLabel.getHeight() * 1.0 / kmeansJpg.getHeight(), imageLabel.getWidth() * 1.0 / kmeansJpg.getWidth());
-                Image dimg = postImage.getScaledInstance((int)Math.floor(postImage.getWidth()*scale), (int)Math.floor(postImage.getHeight()*scale), Image.SCALE_SMOOTH);
-                ImageIcon imageIcon = new ImageIcon(dimg);
-                outputImageLabel.setIcon(imageIcon);
-            }
+            if(dialogResult == 1) confirmation = false;
         }
         if(confirmation)
         {
@@ -1340,7 +1336,6 @@ public class ColorCompressorGUI extends javax.swing.JFrame {
             Image dimg = postImage.getScaledInstance((int)Math.floor(postImage.getWidth()*scale), (int)Math.floor(postImage.getHeight()*scale), Image.SCALE_SMOOTH);
             ImageIcon imageIcon = new ImageIcon(dimg);
             outputImageLabel.setIcon(imageIcon);
-            
         }
     }//GEN-LAST:event_confirmButtonActionPerformed
 
@@ -1399,22 +1394,6 @@ public class ColorCompressorGUI extends javax.swing.JFrame {
             }
         });
     }
-
-    /**
-     * Filter to only allow viewing of folders and JPG/PNG images
-     */
-    public class ImageFilter extends javax.swing.filechooser.FileFilter {
-        @Override
-        public boolean accept(File file) {
-            // Allow only directories, or files with a raster image extension
-            return file.isDirectory() || file.getAbsolutePath().endsWith(".png") || file.getAbsolutePath().endsWith(".jpg") || file.getAbsolutePath().endsWith(".JPG") || file.getAbsolutePath().endsWith(".PNG") || file.getAbsolutePath().endsWith(".jpeg") || file.getAbsolutePath().endsWith(".JPEG");
-        }
-        @Override
-        public String getDescription() {
-            // This description will be displayed in the dialog,
-            return "Image documents(*.jpg or *.png)";
-        }
-    } 
     
     /**
      * Pulls RGB array from the originalImage and runs the K Means algorithm on it
