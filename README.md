@@ -19,4 +19,4 @@ Currently only accepts raster images (.jpg, .png, .jpeg) files up to 8 megapixel
 Here we show using the application with different K values. 
 ![Penguins](https://i.imgur.com/G9FfXN8.png)
 
-This application was written by Tiffany Do with minor bug fixes and help from Dylan Yu and Seong Ioi Wang. Image preprocessing was provided by Vibhav Gogate at UT Dallas. 
+This application was written by Tiffany Do and Dylan Yu with minor bug fixes and help from Seong Ioi Wang. Image preprocessing was provided by Vibhav Gogate at UT Dallas. 
