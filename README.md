@@ -10,8 +10,8 @@ Uses the K-means clustering algorithm to compress images in terms of both size a
 Built in file system support for opening and saving images.
 
 In version v1.2, you now have the ability to select the colors chosen by the algorithm and change them to any color desired.
-![clusterchanging](https://i.imgur.com/JSfUjJN.png)
-![changed](https://i.imgur.com/c5fheli.png)
+![clusterchanging](https://i.imgur.com/XL3UPMt.png)
+![changed](https://i.imgur.com/RYvupjN.png)
 Additionally, color palette swaps can be undone (Ctrl Z) and redone (Ctrl Y)
 
 Currently only accepts raster images (.jpg, .png, .jpeg) files up to 8 megapixels. Handles basic user error checking. Does not support images with transparent pixels and works best with images that do not have a solid background. 
