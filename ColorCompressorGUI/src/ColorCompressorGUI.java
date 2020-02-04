@@ -44,6 +44,8 @@ public class ColorCompressorGUI extends javax.swing.JFrame {
         initComponents();
         hidePalettes();
         this.setTitle("Color Compressor");
+        ImageMouseAdapter ima = new ImageMouseAdapter();
+        this.addMouseListener(ima);
         BufferedImage img = null;
         try {img = ImageIO.read(getClass().getResource("images/bunny_boy.png"));} catch (IOException e) {System.out.println(e);}
         this.setIconImage(img);
@@ -1622,6 +1624,40 @@ public class ColorCompressorGUI extends javax.swing.JFrame {
                 histIndex++;
                 redo.setEnabled(false);
                 if(!undo.isEnabled()) undo.setEnabled(true);
+            }
+        }
+    }     
+    public class ImageMouseAdapter extends MouseAdapter 
+    {
+        // Detect double click
+        @Override
+        public void mouseClicked(MouseEvent e) {
+            if (e.getClickCount() == 2) {
+                if(Math.abs(e.getX() - imageLabel.getX()) <= imageLabel.getWidth() && Math.abs(e.getY() - imageLabel.getY()) <= imageLabel.getHeight()) {
+                    Open.doClick();
+                } else if (Math.abs(e.getX() - outputImageLabel.getX()) <= outputImageLabel.getWidth() && Math.abs(e.getY() - outputImageLabel.getY()) <= outputImageLabel.getHeight()) {
+//                    javax.swing.JFrame newFrame = new javax.swing.JFrame();
+//                    newFrame.setExtendedState(javax.swing.JFrame.MAXIMIZED_BOTH);
+//                    newFrame.setUndecorated(true);
+//                    FullScreenMouseAdapter fsma = new FullScreenMouseAdapter();
+//                    newFrame.addMouseListener(fsma);
+//                    javax.swing.JLabel imageHolder = new javax.swing.JLabel();
+//                    imageHolder.setIcon(new ImageIcon(postImage));
+//                    newFrame.add(imageHolder);
+//                    newFrame.pack();
+//                    newFrame.setVisible(true);
+                }
+            }
+        }
+    }
+    
+    public class FullScreenMouseAdapter extends MouseAdapter
+    {
+        // Detect double click
+        @Override
+        public void mouseClicked(MouseEvent e) {
+            if (e.getClickCount() == 2) {
+                ((javax.swing.JFrame)(e.getSource())).dispose();
             }
         }
     }
